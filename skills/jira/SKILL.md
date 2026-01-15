@@ -197,9 +197,6 @@ jira issue worklog add PROJ-123 "1h 30m"
 
 # With comment
 jira issue worklog add PROJ-123 2h --comment "Implemented feature X"
-
-# List worklogs
-jira issue worklog list PROJ-123
 ```
 
 ## Issue Links
