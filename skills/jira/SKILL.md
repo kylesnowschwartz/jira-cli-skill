@@ -55,6 +55,7 @@ jira me
 | View issue | `jira issue view KEY` |
 | Create issue | `jira issue create -t Type -s "Summary"` |
 | Edit issue | `jira issue edit KEY` |
+| Assign issue | `jira issue assign KEY USER` |
 | Transition | `jira issue move KEY "Status"` |
 | Add comment | `jira issue comment add KEY "text"` |
 | Log work | `jira issue worklog add KEY TIME` |
@@ -154,11 +155,22 @@ jira issue edit PROJ-123 -yHigh
 # Add labels
 jira issue edit PROJ-123 -l newlabel
 
+```
+
+## Assign Issue
+
+```bash
 # Assign to user
-jira issue edit PROJ-123 -a "user@example.com"
+jira issue assign PROJ-123 "user@example.com"
 
 # Assign to me
-jira issue edit PROJ-123 -a$(jira me)
+jira issue assign PROJ-123 $(jira me)
+
+# Default assignee
+jira issue assign PROJ-123 default
+
+# Unassign
+jira issue assign PROJ-123 x
 ```
 
 ## Transition (Move) Issue
