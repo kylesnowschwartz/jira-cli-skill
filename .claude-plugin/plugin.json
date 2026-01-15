@@ -1,0 +1,19 @@
+{
+  "name": "jira-cli-skill",
+  "version": "1.0.0",
+  "description": "Jira integration via jira-cli with wiki markup formatting support",
+  "repository": "https://github.com/kylesnowschwartz/jira-cli-skill",
+  "license": "MIT",
+  "author": {
+    "name": "Kyle Snow Schwartz"
+  },
+  "keywords": [
+    "jira",
+    "jira-cli",
+    "atlassian",
+    "issue-tracking",
+    "project-management",
+    "wiki-markup",
+    "agile"
+  ]
+}
