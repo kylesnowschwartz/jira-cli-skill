@@ -1,17 +1,37 @@
 ---
-name: jira-cli
+name: jira
 description: >
-  Jira CLI wrapper for issue management. Use when: searching issues (jira issue list),
-  viewing issue details (jira issue view), creating issues (jira issue create),
-  transitioning status (jira issue move), adding comments (jira issue comment add),
-  logging work (jira issue worklog add), managing sprints (jira sprint list),
-  managing boards (jira board list), linking issues (jira issue link),
-  or getting user info (jira me). Requires jira-cli installed and configured via `jira init`.
+  Jira integration via jira-cli. Use when: searching issues, viewing issue details,
+  creating issues, transitioning status, adding comments, logging work, managing sprints,
+  managing boards, linking issues, formatting descriptions with wiki markup,
+  converting Markdown to Jira format, or using bug/feature templates.
+  Keywords: jira issue, jira ticket, jira format, wiki markup, jira syntax.
+  Requires jira-cli installed via `brew install jira-cli`.
 ---
 
-# jira-cli
+# Jira
 
-Jira operations via the [jira-cli](https://github.com/ankitpokhrel/jira-cli) Go tool.
+Jira operations via [jira-cli](https://github.com/ankitpokhrel/jira-cli) with wiki markup formatting.
+
+## Wiki Markup Syntax
+
+Jira uses wiki markup, **NOT Markdown**. Use this reference when writing descriptions or comments:
+
+| Jira Syntax | Purpose | NOT this (Markdown) |
+|-------------|---------|---------------------|
+| `h2. Title` | Heading | `## Title` |
+| `*bold*` | Bold | `**bold**` |
+| `_italic_` | Italic | `*italic*` |
+| `{{code}}` | Inline code | `` `code` `` |
+| `{code:java}...{code}` | Code block | ` ```java ``` ` |
+| `[text\|url]` | Link | `[text](url)` |
+| `[PROJ-123]` | Issue link | - |
+| `[~username]` | User mention | `@username` |
+| `* item` | Bullet list | `- item` |
+| `# item` | Numbered list | `1. item` |
+| `\|\|Header\|\|` | Table header | `\|Header\|` |
+
+See `references/syntax-reference.md` for complete documentation.
 
 ## Prerequisites
 
@@ -29,20 +49,20 @@ jira me
 
 ## Quick Reference
 
-| Operation     | Command                                     |
-| -----------   | ---------                                   |
-| Search issues | `jira issue list -q "JQL"`                  |
-| View issue    | `jira issue view KEY`                       |
-| Create issue  | `jira issue create -t Type -s "Summary"`    |
-| Edit issue    | `jira issue edit KEY`                       |
-| Transition    | `jira issue move KEY "Status"`              |
-| Add comment   | `jira issue comment add KEY "text"`         |
-| Log work      | `jira issue worklog add KEY TIME`           |
-| Link issues   | `jira issue link KEY1 KEY2 TYPE`            |
-| List sprints  | `jira sprint list BOARD_ID`                 |
-| List boards   | `jira board list -p PROJECT`                |
-| Current user  | `jira me`                                   |
-| Find fields   | `uv run scripts/jira-fields.py search TERM` |
+| Operation | Command |
+|-----------|---------|
+| Search issues | `jira issue list -q "JQL"` |
+| View issue | `jira issue view KEY` |
+| Create issue | `jira issue create -t Type -s "Summary"` |
+| Edit issue | `jira issue edit KEY` |
+| Transition | `jira issue move KEY "Status"` |
+| Add comment | `jira issue comment add KEY "text"` |
+| Log work | `jira issue worklog add KEY TIME` |
+| Link issues | `jira issue link KEY1 KEY2 TYPE` |
+| List sprints | `jira sprint list BOARD_ID` |
+| List boards | `jira board list -p PROJECT` |
+| Current user | `jira me` |
+| Find fields | `uv run scripts/jira-fields.py search TERM` |
 
 ## Search & List Issues
 
@@ -90,14 +110,21 @@ jira open PROJ-123
 
 ## Create Issue
 
-> **Formatting:** Descriptions use Jira wiki markup, NOT Markdown. Load the **jira-syntax** skill or use: `*bold*`, `h2. Heading`, `{code:lang}...{code}`.
-
 ```bash
 # Basic creation
 jira issue create -p PROJ -t Task -s "Fix login bug"
 
 # With description and priority
-jira issue create -p PROJ -t Bug -s "Login fails" -b "Steps to reproduce..." -yHigh
+jira issue create -p PROJ -t Bug -s "Login fails" -b "h2. Steps to Reproduce
+# Navigate to login
+# Enter credentials
+# Click submit
+
+h2. Expected
+Login succeeds
+
+h2. Actual
+500 error" -yHigh
 
 # With labels and components
 jira issue create -p PROJ -t Story -s "New feature" -l backend -l "high prio" -C "API"
@@ -224,7 +251,24 @@ jira board list -p PROJ
 | `--columns KEY,SUMMARY,...` | Select columns |
 | `--no-headers` | Hide table headers |
 
-## Field Discovery (Python Script)
+## Templates
+
+Use these templates for well-structured issues:
+
+- **Bug Report**: `templates/bug-report-template.md` - Environment, Steps to Reproduce, Expected/Actual, Error Messages
+- **Feature Request**: `templates/feature-request-template.md` - Overview, User Stories, Acceptance Criteria, Technical Approach
+
+## Syntax Validation
+
+Validate wiki markup before submitting:
+
+```bash
+scripts/validate-jira-syntax.sh path/to/content.txt
+```
+
+Checks for common Markdown mistakes and suggests Jira equivalents.
+
+## Field Discovery
 
 jira-cli cannot list available fields. Use the included Python script:
 
@@ -240,19 +284,12 @@ uv run scripts/jira-fields.py list --type custom
 uv run scripts/jira-fields.py --json search "epic"
 ```
 
-This requires separate auth via `~/.env.jira`:
+Requires auth via `~/.env.jira`:
 
 ```
 JIRA_URL=https://company.atlassian.net
 JIRA_USERNAME=your-email@example.com
 JIRA_API_TOKEN=your-api-token
-```
-
-Or for Server/DC:
-
-```
-JIRA_URL=https://jira.yourcompany.com
-JIRA_PERSONAL_TOKEN=your-personal-access-token
 ```
 
 ## Common Workflows
@@ -276,22 +313,6 @@ jira issue comment add PROJ-123 "WIP: implementing feature X"
 jira issue move PROJ-123 "Done" -R"Fixed"
 ```
 
-### Create a bug with full details
-
-```bash
-jira issue create -p PROJ -t Bug \
-  -s "Login fails for SSO users" \
-  -b "Steps to reproduce:
-1. Click SSO login
-2. Enter credentials
-3. Error appears
-
-Expected: Login succeeds
-Actual: 500 error" \
-  -yHigh \
-  -l bug -l auth
-```
-
 ### Sprint planning
 
 ```bash
@@ -308,16 +329,11 @@ jira issue list -p PROJ -s Backlog --plain --columns KEY,SUMMARY,PRIORITY
 jira sprint add SPRINT_ID PROJ-100 PROJ-101 PROJ-102
 ```
 
-## Related Skills
-
-**jira-syntax**: Use for formatting descriptions and comments. Jira uses wiki markup, NOT Markdown:
-- `*bold*` not `**bold**`
-- `h2. Heading` not `## Heading`
-- `{code:python}...{code}` not triple backticks
-
 ## References
 
 - [Command Reference](references/command-reference.md) - Quick lookup table
 - [JQL Quick Reference](references/jql-quick-reference.md) - Query syntax
 - [Backlog Quick Wins](references/backlog-quick-wins.md) - Finding actionable items
+- [Syntax Reference](references/syntax-reference.md) - Complete wiki markup documentation
 - [jira-cli GitHub](https://github.com/ankitpokhrel/jira-cli) - Full documentation
+- [Official Jira Wiki Markup](https://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all)

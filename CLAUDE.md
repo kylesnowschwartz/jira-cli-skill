@@ -4,24 +4,21 @@ Project guidance for Claude Code when working with this plugin.
 
 ## Overview
 
-This plugin provides Jira integration through two skills:
-
-1. **jira-cli**: Wrapper for the [jira-cli](https://github.com/ankitpokhrel/jira-cli) Go tool
-2. **jira-syntax**: Wiki markup formatting for Jira content
+This plugin provides Jira integration through a single **jira** skill that combines CLI operations with wiki markup formatting.
 
 ## Architecture
 
 ```
 jira-cli-skill/
 ├── .claude-plugin/plugin.json     # Plugin manifest
-├── SKILL.md                       # Root skill (entry point)
 ├── skills/
-│   ├── jira-cli/                  # PRIMARY: jira-cli commands
-│   │   ├── SKILL.md               # Command reference
-│   │   ├── scripts/
-│   │   │   └── jira-fields.py     # ONLY Python script
-│   │   └── references/
-│   └── jira-syntax/               # Wiki markup skill
+│   └── jira/                      # Single unified skill
+│       ├── SKILL.md               # Commands + wiki markup syntax
+│       ├── scripts/
+│       │   ├── jira-fields.py     # Field discovery (Python)
+│       │   └── validate-jira-syntax.sh
+│       ├── references/
+│       └── templates/
 ```
 
 ## Key Principles
@@ -30,7 +27,7 @@ jira-cli-skill/
 2. **Wiki markup required**: All Jira content (descriptions, comments) MUST use Jira wiki markup, NOT Markdown
 3. **Single Python script**: `jira-fields.py` is the only Python code - it fills the one gap in jira-cli
 
-## When to Use Which
+## Quick Reference
 
 | Need | Use |
 |------|-----|
@@ -42,7 +39,7 @@ jira-cli-skill/
 | Add comment | `jira issue comment add KEY "text"` |
 | Log work | `jira issue worklog add KEY TIME` |
 | Find custom fields | `uv run scripts/jira-fields.py search TERM` |
-| Format content | Load **jira-syntax** skill |
+| Validate syntax | `scripts/validate-jira-syntax.sh file.txt` |
 
 ## Authentication
 
@@ -53,7 +50,7 @@ jira-cli-skill/
 
 - Do not add more Python scripts - use jira-cli for new features
 - The jira-fields.py script is standalone (no external lib dependencies)
-- Reference files in `skills/jira-cli/references/` for JQL, backlog queries
+- Reference files in `skills/jira/references/` for JQL, backlog queries, syntax
 
 ## Testing
 
@@ -63,5 +60,8 @@ jira --version
 jira serverinfo
 
 # Verify field discovery
-uv run skills/jira-cli/scripts/jira-fields.py --help
+uv run skills/jira/scripts/jira-fields.py --help
+
+# Verify syntax validation
+skills/jira/scripts/validate-jira-syntax.sh --help
 ```
