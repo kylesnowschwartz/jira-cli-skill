@@ -60,11 +60,16 @@ h6. Heading Level 6 (smallest)
 ```
 
 ### Numbered Lists
+
+**Warning:** `# item` is the official wiki syntax for numbered lists, but Jira Cloud often renders these as h1 headings. Prefer bullet lists (`* item`) for reliability.
+
 ```
-# First item
+# First item     (may render as h1 heading in Jira Cloud!)
 ## Nested item
-## Another nested item
 # Second item
+
+* 1. First item  (reliable alternative)
+* 2. Second item
 ```
 
 ### Mixed Lists
@@ -79,6 +84,8 @@ h6. Heading Level 6 (smallest)
 - Space after `*` or `#`
 - Nesting uses additional symbols (`**`, `##`)
 - Can mix list types with combined syntax (`#*`)
+- Prefer `* item` bullets over `# item` numbered lists (Jira Cloud rendering bug)
+- Never start a bullet with bold text: `* *bold*` breaks the list
 
 ## Links
 
@@ -276,9 +283,9 @@ h4. Blocked
 * See [PROJ-123] for details
 
 h4. Next Steps
-# Deploy to staging environment
-# Conduct security review
-# Schedule production deployment
+* Deploy to staging environment
+* Conduct security review
+* Schedule production deployment
 ```
 
 ### Code Review Comment
@@ -322,9 +329,9 @@ h3. Attendees
 * [~dev1], [~dev2], [~dev3] - Development Team
 
 h3. Agenda
-# Review last sprint outcomes
-# Plan current sprint scope
-# Assign tasks and estimates
+* Review last sprint outcomes
+* Plan current sprint scope
+* Assign tasks and estimates
 
 h3. Decisions
 ||Decision||Owner||Action Items||
@@ -333,9 +340,9 @@ h3. Decisions
 |Refactor authentication|[~dev2]|[PROJ-502] - Design proposal needed|
 
 h3. Action Items
-# [~pm] - Update roadmap with Q1 priorities
-# [~tech-lead] - Schedule architecture review
-# [~dev1] - Provide effort estimates by Friday
+* [~pm] - Update roadmap with Q1 priorities
+* [~tech-lead] - Schedule architecture review
+* [~dev1] - Provide effort estimates by Friday
 
 h3. Next Meeting
 *Date:* 2025-11-13 10:00 AM
@@ -397,6 +404,33 @@ Before submitting, verify:
 | `h2.Title` | `h2. Title` | Missing space after period |
 | `{code}` | `{code:java}` | Missing language identifier |
 | `|Header|` | `||Header||` | Header needs double pipes |
+
+## Jira Cloud Pitfalls
+
+These issues are specific to Jira Cloud's editor and may not be caught by syntax validators:
+
+### Numbered lists render as headings
+`# item` is the official wiki markup for numbered lists, but Jira Cloud often renders these as h1 headings instead. Use bullet lists (`* item`) with manual numbering, or use `{noformat}` blocks for numbered sequences:
+```
+* 1. First item
+* 2. Second item
+* 3. Third item
+```
+
+### Bold on first word of bullet breaks the list
+The bullet marker `*` collides with bold `*text*` when bold is the first thing after the bullet:
+```
+❌ * *Bold first word* then rest of text
+✅ * _Italic first word_ then rest of text
+✅ * The *bold word* is not first
+✅ * Regular text here
+```
+
+### Code blocks escape special characters
+`{code}` blocks may escape parentheses and other characters when submitted via CLI tools. For simple structured text, prefer `{noformat}` or nested bullet lists instead of code blocks.
+
+### Pipe-submitted content may lose formatting
+When piping content via stdin to `jira issue edit`, ensure the tool preserves newlines. A missing blank line between a heading and a list can merge them into a single malformed heading.
 
 ## Resources
 

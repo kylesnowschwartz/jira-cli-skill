@@ -28,8 +28,13 @@ Jira uses wiki markup, **NOT Markdown**. Use this reference when writing descrip
 | `[PROJ-123]` | Issue link | - |
 | `[~username]` | User mention | `@username` |
 | `* item` | Bullet list | `- item` |
-| `# item` | Numbered list | `1. item` |
+| `# item` | Numbered list (see warning) | `1. item` |
 | `\|\|Header\|\|` | Table header | `\|Header\|` |
+
+**Wiki Markup Pitfalls (Jira Cloud):**
+- `# item` numbered lists often render as h1 headings in Jira Cloud. Prefer `* item` bullets instead.
+- `* *bold text*` breaks bullet lists — the bold `*` collides with the bullet `*`. Avoid bold as the first word of a bullet, or use `_italic_` instead.
+- `{code}` blocks may escape parentheses and special characters when submitted via CLI. Use `{noformat}` or nested bullets for simple structured text.
 
 See `references/syntax-reference.md` for complete documentation.
 
@@ -117,9 +122,9 @@ jira issue create -p PROJ -t Task -s "Fix login bug"
 
 # With description and priority
 jira issue create -p PROJ -t Bug -s "Login fails" -b "h2. Steps to Reproduce
-# Navigate to login
-# Enter credentials
-# Click submit
+* Navigate to login
+* Enter credentials
+* Click submit
 
 h2. Expected
 Login succeeds
