@@ -36,7 +36,8 @@ jira me
 
 ```bash
 # Via Claude Code
-/install-plugin /path/to/jira-cli-skill
+claude plugin marketplace add kylesnowschwartz/jira-cli-skill
+claude plugin install jira-cli-skill
 ```
 
 ## Quick Start
