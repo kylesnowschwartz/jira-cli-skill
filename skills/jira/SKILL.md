@@ -68,7 +68,7 @@ jira me
 | List sprints | `jira sprint list BOARD_ID` |
 | List boards | `jira board list -p PROJECT` |
 | Current user | `jira me` |
-| Find fields | `uv run scripts/jira-fields.py search TERM` |
+| Find fields | `ruby scripts/jira_fields.rb search TERM` |
 
 ## Search & List Issues
 
@@ -284,18 +284,18 @@ Checks for common Markdown mistakes and suggests Jira equivalents.
 
 ## Field Discovery
 
-jira-cli cannot list available fields. Use the included Python script:
+jira-cli cannot list available fields. Use the included Ruby script:
 
 ```bash
 # Search for fields by name
-uv run scripts/jira-fields.py search "story points"
-uv run scripts/jira-fields.py search sprint
+ruby scripts/jira_fields.rb search "story points"
+ruby scripts/jira_fields.rb search sprint
 
 # List all custom fields
-uv run scripts/jira-fields.py list --type custom
+ruby scripts/jira_fields.rb list --type custom
 
 # JSON output
-uv run scripts/jira-fields.py --json search "epic"
+ruby scripts/jira_fields.rb search "epic" --json
 ```
 
 Requires auth via `~/.env.jira`:

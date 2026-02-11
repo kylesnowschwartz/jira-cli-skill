@@ -1,0 +1,21 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+
+# Standalone utility scripts parsing complex formats (ADF, REST APIs)
+# Default metrics are tuned for Rails app classes, not CLI scripts
+Metrics/MethodLength:
+  Max: 50
+Metrics/AbcSize:
+  Max: 40
+Metrics/CyclomaticComplexity:
+  Max: 30
+Metrics/PerceivedComplexity:
+  Max: 20
+
+Style/Documentation:
+  Enabled: false
+
+# Intentional in parsers/formatters for clarity
+Lint/DuplicateBranch:
+  Enabled: false

@@ -11,11 +11,14 @@ This plugin provides Jira integration through a single **jira** skill that combi
 ```
 jira-cli-skill/
 ├── .claude-plugin/plugin.json     # Plugin manifest
+├── commands/
+│   └── jira-context.md            # /jira-context command
 ├── skills/
 │   └── jira/                      # Single unified skill
 │       ├── SKILL.md               # Commands + wiki markup syntax
 │       ├── scripts/
-│       │   ├── jira-fields.py     # Field discovery (Python)
+│       │   ├── jira_context.rb    # Context gathering (Ruby)
+│       │   ├── jira_fields.rb     # Field discovery (Ruby)
 │       │   └── validate-jira-syntax.sh
 │       ├── references/
 │       └── templates/
@@ -25,7 +28,7 @@ jira-cli-skill/
 
 1. **jira-cli first**: Use native jira-cli commands for everything except field discovery
 2. **Wiki markup required**: All Jira content (descriptions, comments) MUST use Jira wiki markup, NOT Markdown
-3. **Single Python script**: `jira-fields.py` is the only Python code - it fills the one gap in jira-cli
+3. **Ruby and Bash scripts only**: No external language dependencies beyond Ruby stdlib
 
 ## Quick Reference
 
@@ -33,23 +36,26 @@ jira-cli-skill/
 |------|-----|
 | Search/list issues | `jira issue list` |
 | View issue | `jira issue view KEY` |
+| Load full context | `/jira-context KEY` (parent, children, siblings, comments) |
 | Create issue | `jira issue create` |
 | Edit issue | `jira issue edit KEY` |
 | Transition issue | `jira issue move KEY STATUS` |
 | Add comment | `jira issue comment add KEY "text"` |
 | Log work | `jira issue worklog add KEY TIME` |
-| Find custom fields | `uv run scripts/jira-fields.py search TERM` |
+| Find custom fields | `ruby scripts/jira_fields.rb search TERM` |
 | Validate syntax | `scripts/validate-jira-syntax.sh file.txt` |
 
 ## Authentication
 
 - **jira-cli**: Configured via `jira init` -> `~/.config/.jira/.config.yml`
-- **jira-fields.py**: Uses `~/.env.jira` (separate auth for the Python script)
+- **jira_fields.rb**: Uses `~/.env.jira` or `JIRA_URL`/`JIRA_USERNAME`/`JIRA_API_TOKEN` env vars
 
 ## Development Notes
 
-- Do not add more Python scripts - use jira-cli for new features
-- The jira-fields.py script is standalone (no external lib dependencies)
+- Use jira-cli for new features when possible
+- The jira_fields.rb script fills a gap in jira-cli (field discovery)
+- The jira_context.rb script provides rich context (parent, children, siblings, comments)
+- Both scripts are standalone with no external lib dependencies
 - Reference files in `skills/jira/references/` for JQL, backlog queries, syntax
 
 ## Testing
@@ -59,8 +65,11 @@ jira-cli-skill/
 jira --version
 jira serverinfo
 
+# Verify context gathering
+ruby skills/jira/scripts/jira_context.rb PROJ-123
+
 # Verify field discovery
-uv run skills/jira/scripts/jira-fields.py --help
+ruby skills/jira/scripts/jira_fields.rb --help
 
 # Verify syntax validation
 skills/jira/scripts/validate-jira-syntax.sh --help
