@@ -47,8 +47,9 @@ jira-cli-skill/
 
 ## Authentication
 
-- **jira-cli**: Configured via `jira init` -> `~/.config/.jira/.config.yml`
-- **jira_fields.rb**: Uses `~/.env.jira` or `JIRA_URL`/`JIRA_USERNAME`/`JIRA_API_TOKEN` env vars
+- **jira-cli**: Configured via `jira init` -> `~/.config/.jira/.config.yml`. Requires `JIRA_API_TOKEN` env var at runtime.
+- **jira_fields.rb**: Uses `~/.env.jira` or `JIRA_URL`/`JIRA_USERNAME`/`JIRA_API_TOKEN` env vars (direnv works for both)
+- **Common issue**: Token exists in direnv for one project but not another. See "Troubleshooting Auth" in SKILL.md.
 
 ## Development Notes
 

@@ -52,6 +52,46 @@ jira serverinfo
 jira me
 ```
 
+## Troubleshooting Auth
+
+If `jira me` fails with a token error, the token likely exists but isn't visible in the current shell. Check these locations before asking the user to generate a new one:
+
+```bash
+# 1. Is the env var set in this shell?
+echo $JIRA_API_TOKEN
+
+# 2. Is direnv loading it from a shared env file?
+grep -r "JIRA_API_TOKEN" ~/.config/direnv/envrc.d/ 2>/dev/null
+
+# 3. Is it in a project-specific .envrc that hasn't been sourced here?
+grep -rl "JIRA" ~/Code/**/.envrc 2>/dev/null
+
+# 4. Is there a dedicated env file for the Ruby scripts?
+cat ~/.env.jira 2>/dev/null
+
+# 5. Check the jira-cli config itself
+cat ~/.config/.jira/.config.yml | head -10
+```
+
+Common fix: if the token is loaded via direnv in another project, add a `.envrc` to the current project that sources the same shared file (e.g. `source_env ~/.config/direnv/envrc.d/envato.sh`), then run `direnv allow`.
+
+## Switching Projects and Boards
+
+jira-cli stores its default project and board in `~/.config/.jira/.config.yml`. When switching teams or projects, update these fields:
+
+```yaml
+board:
+    id: 2469              # Board ID (find via: jira board list -p PROJ)
+    name: My Team Board   # Display name
+    type: kanban           # kanban or scrum
+# ...
+project:
+    key: EN               # Project key
+    type: classic          # classic or next-gen
+```
+
+You can also override the project per-command with `-p PROJECT` without changing the config.
+
 ## Quick Reference
 
 | Operation | Command |
@@ -253,6 +293,8 @@ jira board list -p PROJ
 # Get board ID, then use for sprint operations
 ```
 
+**Note:** `jira board list` does not support `--plain` or other output flags. It always outputs a simple table.
+
 ## Output Formats
 
 | Flag | Description |
@@ -298,7 +340,9 @@ ruby scripts/jira_fields.rb list --type custom
 ruby scripts/jira_fields.rb search "epic" --json
 ```
 
-Requires auth via `~/.env.jira`:
+Requires auth via environment variables. The script checks `~/.env.jira` first, then falls back to env vars (`JIRA_URL`, `JIRA_USERNAME`, `JIRA_API_TOKEN`). If you already have these set via direnv, no extra file is needed.
+
+Example `~/.env.jira` (only if not using direnv):
 
 ```
 JIRA_URL=https://company.atlassian.net
